@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id        String   @id @default(uuid()) @db.Uuid
+  nome      String
+  email     String   @unique
+  senhaHash String
+  criadoEm  DateTime @default(now())
+
+  cartas Carta[]
+}
+
+model Carta {
+  id            String   @id @default(uuid()) @db.Uuid
+  nome          String
+  colecao       String
+  numeroCarta   String
+  tipo          String
+  raridade      String
+  condicao      String
+  quantidade    Int      @default(1)
+  valorEstimado Float?
+  urlImagem     String?
+  criadoEm      DateTime @default(now())
+  usuarioId     String   @db.Uuid
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, colecao, numeroCarta])
+  @@index([nome])
+  @@index([colecao])
+  @@index([usuarioId])
+}
